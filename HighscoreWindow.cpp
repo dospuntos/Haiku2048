@@ -1,5 +1,6 @@
 /*
  * Copyright 2022, Harshit Sharma <harshits908@gmail.com>
+ * Copyright 2023, Johan Wagenheim
  * This file is distributed under the terms of the MIT license
  */
 
@@ -15,7 +16,6 @@
 #include <Button.h>
 #include <String.h>
 #include <StringView.h>
-#include <Alert.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "HighscoreWindow"
@@ -25,54 +25,66 @@ static const uint32 kNameEntered = 'NmEn';
 HighscoreWindow::HighscoreWindow(const char* oldHighscorer, const int32 oldHighscore, 
 	const int32 newHighscore, const BMessenger &messenger)
 	:
-	BWindow(BRect(200, 200, 600, 450), B_TRANSLATE("New High Score"), B_MODAL_WINDOW, B_NOT_CLOSABLE | B_NOT_RESIZABLE), fMessenger(messenger)
+	BWindow(BRect(200, 200, 1,1), 0, B_MODAL_WINDOW, B_NOT_CLOSABLE | B_NOT_RESIZABLE),
+				fMessenger(messenger)
 {
 	BStringView* congratulations = new BStringView("congratulations", B_TRANSLATE("Congratulations!"));
 	congratulations->SetFont(be_bold_font);
 	congratulations->SetFontSize(25);
 	congratulations->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);
 	
-	BString newHighScoreText = B_TRANSLATE("New high-score: %newhighscore%");
-	newHighScoreText.ReplaceFirst("%newhighscore%", std::to_string(newHighscore).c_str());
-	BStringView* newHighScore = new BStringView("newHighScore", newHighScoreText.String());
+	BString newHighscoreText = B_TRANSLATE("New highscore: %newhighscore%");
+	newHighscoreText.ReplaceFirst("%newhighscore%", std::to_string(newHighscore).c_str());
+	BStringView* newHighScore = new BStringView("newHighScore", newHighscoreText.String());
 	newHighScore->SetFont(be_bold_font);
 	newHighScore->SetFontSize(20);
-	newHighScore->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);	
+	newHighScore->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);
+	
+	BStringView* inputlabel = new BStringView("inputlabel",
+										B_TRANSLATE("Please enter your name:"));
+	inputlabel->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);
+	inputlabel->SetFont(be_bold_font);
 
 	fInputBox = new
-		BTextControl("NameInput", B_TRANSLATE("Please enter your name:"), NULL,
-		new BMessage(kNameEntered));
-
-	BStringView* line1 = new BStringView("line1", B_TRANSLATE("You achieved a new highscore, beating the one"));
-	BString line2Text = B_TRANSLATE("by %oldHighscorer% by %deltaScore%.");
-	BString line3Text = B_TRANSLATE("Your new highscore is %newhighscore%");
-	
-	line2Text.ReplaceFirst("%oldHighscorer%", oldHighscorer);
-	line2Text.ReplaceFirst("%deltaScore%", std::to_string(newHighscore - oldHighscore).c_str());
-	line3Text.ReplaceFirst("%newhighscore%", std::to_string(newHighscore).c_str());
-	BStringView* line2 = new BStringView("line2", line2Text.String());
-	BStringView* line3 = new BStringView("line3", line3Text.String());
-	
-	BButton *saveName = new BButton("savename", B_TRANSLATE("Hooray!!!"),
-		new BMessage(kNameEntered));
-	saveName->ResizeToPreferred();
-	
+		BTextControl("NameInput", NULL, NULL, new BMessage(kNameEntered));
+	fInputBox->SetText(B_TRANSLATE("Anonymous"));
+	fInputBox->SetAlignment(B_ALIGN_HORIZONTAL_CENTER,B_ALIGN_HORIZONTAL_CENTER);
 	fInputBox->MakeFocus();
+	
+	BString previousWinner;
+	previousWinner << B_TRANSLATE("This is the first record!");
+	if (true) {
+		// Replace with previous winner and score difference
+		previousWinner = B_TRANSLATE("You've beaten the previous record holder\n"
+										"%oldHighscorer% by %deltaScore%.");
+		previousWinner.ReplaceFirst("%oldHighscorer%", oldHighscorer);
+		previousWinner.ReplaceFirst("%deltaScore%", 
+					std::to_string(newHighscore - oldHighscore).c_str());
+	}
+
+	BStringView* line2 = new BStringView("line2", previousWinner.String());
+	line2->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);	
+	
+	BButton *saveName = new BButton("savename", B_TRANSLATE("Hooray!"),
+		new BMessage(kNameEntered));
+	saveName->SetFontSize(15);
+	saveName->SetFont(be_bold_font);
+	saveName->ResizeToPreferred();
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_WINDOW_INSETS)
 		.AddGroup(B_VERTICAL)
 			.Add(congratulations)
-			.AddStrut(3)
 			.Add(newHighScore)
-			.Add(line1)
 			.Add(line2)
-			.Add(line3)
-			.AddStrut(5)
+			.AddStrut(3)
+			.Add(inputlabel)
 			.Add(fInputBox)
 			.Add(saveName)
 			.AddGlue()
 			.End();
+			
+	this->ResizeToPreferred();
 }
 
 bool
@@ -81,9 +93,11 @@ HighscoreWindow::QuitRequested()
 	return true;
 }
 
+
 HighscoreWindow::~HighscoreWindow()
 {
 }
+
 
 void
 HighscoreWindow::MessageReceived(BMessage* message)
@@ -92,6 +106,10 @@ HighscoreWindow::MessageReceived(BMessage* message)
 	{
 		case kNameEntered:
 		{
+			// Set a default value if empty
+			if (!fInputBox->Text()[0])
+				fInputBox->SetText(B_TRANSLATE("Anonymous"));
+
 			BMessage *req = new BMessage(H2048_NAME_REQUESTED);
 			req->AddString("playername", fInputBox->Text());
 			fMessenger.SendMessage(req);

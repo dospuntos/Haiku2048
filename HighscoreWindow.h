@@ -1,5 +1,6 @@
 /*
  * Copyright 2022, Harshit Sharma <harshits908@gmail.com>
+ * Copyright 2023, Johan Wagenheim
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 
@@ -9,8 +10,6 @@
 
 #include <Window.h>
 #include <Messenger.h>
-#include "WindowBoard.h"
-#include <Application.h>
 
 class BStringView;
 class BTextControl;
@@ -28,7 +27,6 @@ public:
 private:
 		BTextControl*	fInputBox;
 		BMessenger		fMessenger;
-		BApplication*	be_app;
 };
 
 

@@ -41,7 +41,7 @@ GameWindow::GameWindow(WindowBoard *master)
 	undoButton->SetIcon(fIconUndo);
 	undoButton->SetEnabled(false);
 	
-	BButton *getNameButton = new BButton("getName", "TEST", new BMessage(H2048_REQUEST_NAME));
+	BButton *getNameButton = new BButton("getName", "X", new BMessage(H2048_REQUEST_NAME));
 	getNameButton->ResizeToPreferred();
 
 	fScore_Highest = new BStringView("score_highest", B_TRANSLATE("High-score: 0"));
@@ -55,7 +55,7 @@ GameWindow::GameWindow(WindowBoard *master)
 		.AddGroup(B_HORIZONTAL)
 			.Add(newGameButton)
 			.Add(undoButton)
-			.Add(getNameButton)
+			//.Add(getNameButton)
 			.AddStrut(5)
 			.AddGroup(B_VERTICAL, -15)
 				.Add(fHighscoreName)
@@ -67,6 +67,7 @@ GameWindow::GameWindow(WindowBoard *master)
 			.AddGlue()
 			.Add(fScore)
 			.End()
+		.AddGlue()
 		.Add(fBoard);
 
 
@@ -193,11 +194,13 @@ GameWindow::MessageReceived(BMessage *message)
 		case H2048_REQUEST_NAME:
 		{
 			BMessenger messenger(fMaster->fTarget);
-			HighscoreWindow *highscoreWindow = new HighscoreWindow(fMaster->fTarget->Username(),
-				fPreviousHighscore, fMaster->fTarget->Score(), messenger);
+			HighscoreWindow *highscoreWindow = new HighscoreWindow(
+								fMaster->fTarget->Username(),
+								fPreviousHighscore, fMaster->fTarget->Score(),
+								messenger);
 			highscoreWindow->Show();
 			highscoreWindow->Activate();
-			
+		
 			break;
 		}
 		default:
