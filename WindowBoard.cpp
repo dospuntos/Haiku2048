@@ -40,6 +40,9 @@ GameWindow::GameWindow(WindowBoard *master)
 		new BMessage(H2048_UNDO_MOVE));
 	undoButton->SetIcon(fIconUndo);
 	undoButton->SetEnabled(false);
+	
+	BButton *getNameButton = new BButton("getName", "TEST", new BMessage(H2048_REQUEST_NAME));
+	getNameButton->ResizeToPreferred();
 
 	fScore_Highest = new BStringView("score_highest", B_TRANSLATE("High-score: 0"));
 	fScore = new BStringView("score", B_TRANSLATE("Score: 0"));
@@ -52,6 +55,7 @@ GameWindow::GameWindow(WindowBoard *master)
 		.AddGroup(B_HORIZONTAL)
 			.Add(newGameButton)
 			.Add(undoButton)
+			.Add(getNameButton)
 			.AddStrut(5)
 			.AddGroup(B_VERTICAL, -15)
 				.Add(fHighscoreName)

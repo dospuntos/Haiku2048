@@ -8,6 +8,7 @@
 
 
 #include <Window.h>
+#include "WindowBoard.h"
 
 class BStringView;
 class BTextControl;
@@ -22,7 +23,6 @@ public:
 			void		MessageReceived(BMessage *message);
 
 private:
-
 		BTextControl*	fInputBox;
 };
 
