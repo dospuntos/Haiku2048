@@ -8,7 +8,9 @@
 
 
 #include <Window.h>
+#include <Messenger.h>
 #include "WindowBoard.h"
+#include <Application.h>
 
 class BStringView;
 class BTextControl;
@@ -16,7 +18,8 @@ class BTextControl;
 class HighscoreWindow : public BWindow{
 
 public:
-			HighscoreWindow(const char* oldHighscorer, const int32 oldHighscore, const int32 newHighScore);
+			HighscoreWindow(const char* oldHighscorer, const int32 oldHighscore,
+							const int32 newHighScore, const BMessenger &msgr);
 			~HighscoreWindow();
 
 			bool		QuitRequested();
@@ -24,6 +27,8 @@ public:
 
 private:
 		BTextControl*	fInputBox;
+		BMessenger		fMessenger;
+		BApplication*	be_app;
 };
 
 

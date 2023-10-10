@@ -18,6 +18,7 @@
 #include <Path.h>
 #include <Volume.h>
 #include <Directory.h>
+#include <Alert.h>
 
 Game::Game(uint32 sizeX, uint32 sizeY)
 	:

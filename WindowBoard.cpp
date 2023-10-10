@@ -192,24 +192,14 @@ GameWindow::MessageReceived(BMessage *message)
 		}
 		case H2048_REQUEST_NAME:
 		{
+			BMessenger messenger(fMaster->fTarget);
 			HighscoreWindow *highscoreWindow = new HighscoreWindow(fMaster->fTarget->Username(),
-				fPreviousHighscore, fMaster->fTarget->Score());
+				fPreviousHighscore, fMaster->fTarget->Score(), messenger);
 			highscoreWindow->Show();
 			highscoreWindow->Activate();
 			
 			break;
 		}
-		/*case H2048_SET_NAME:
-		{
-			BMessage req(H2048_NAME_REQUESTED);
-			req.AddString("playername", fInputBox->Text());
-			BMessenger messenger(NULL, fMaster->fTarget);
-			messenger.SendMessage(&req);
-			ResizeBy(0.0, -35.0);
-			RemoveChild(FindView("reqbox"));
-			delete fInputBox;
-			fInputBox = NULL;
-		}*/
 		default:
 			BWindow::MessageReceived(message);
 			break;

@@ -22,9 +22,10 @@
 
 static const uint32 kNameEntered = 'NmEn';
 
-HighscoreWindow::HighscoreWindow(const char* oldHighscorer, const int32 oldHighscore, const int32 newHighscore)
+HighscoreWindow::HighscoreWindow(const char* oldHighscorer, const int32 oldHighscore, 
+	const int32 newHighscore, const BMessenger &messenger)
 	:
-	BWindow(BRect(200, 200, 600, 450), B_TRANSLATE("New High Score"), B_TITLED_WINDOW, 0)
+	BWindow(BRect(200, 200, 600, 450), B_TRANSLATE("New High Score"), B_TITLED_WINDOW, 0), fMessenger(messenger)
 {
 	BStringView* congratulations = new BStringView("congratulations", B_TRANSLATE("Congratulations!"));
 	congratulations->SetFont(be_bold_font);
@@ -73,7 +74,6 @@ HighscoreWindow::QuitRequested()
 
 HighscoreWindow::~HighscoreWindow()
 {
-	delete(fInputBox);
 }
 
 void
@@ -85,20 +85,12 @@ HighscoreWindow::MessageReceived(BMessage* message)
 		{
 			BMessage *req = new BMessage(H2048_NAME_REQUESTED);
 			req->AddString("playername", fInputBox->Text());
-			BMessenger messenger(this);
-			messenger.SendMessage(req);
-			QuitRequested();
+			fMessenger.SendMessage(req);
+			Quit();
 			break;
-		}
-		case H2048_NAME_REQUESTED:
-		{
-			BAlert *alert = new BAlert("AlerT", "Testing", "TEST");
-			alert->Go();
-			break;	
-		}
-		
-		
+		}		
 		default:
+			BWindow::MessageReceived(message);
 			break;
 	}
 }
