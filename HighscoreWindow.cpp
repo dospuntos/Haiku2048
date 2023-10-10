@@ -25,17 +25,23 @@ static const uint32 kNameEntered = 'NmEn';
 HighscoreWindow::HighscoreWindow(const char* oldHighscorer, const int32 oldHighscore, 
 	const int32 newHighscore, const BMessenger &messenger)
 	:
-	BWindow(BRect(200, 200, 600, 450), B_TRANSLATE("New High Score"), B_TITLED_WINDOW, 0), fMessenger(messenger)
+	BWindow(BRect(200, 200, 600, 450), B_TRANSLATE("New High Score"), B_MODAL_WINDOW, B_NOT_CLOSABLE | B_NOT_RESIZABLE), fMessenger(messenger)
 {
 	BStringView* congratulations = new BStringView("congratulations", B_TRANSLATE("Congratulations!"));
 	congratulations->SetFont(be_bold_font);
 	congratulations->SetFontSize(25);
 	congratulations->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);
+	
+	BString newHighScoreText = B_TRANSLATE("New high-score: %newhighscore%");
+	newHighScoreText.ReplaceFirst("%newhighscore%", std::to_string(newHighscore).c_str());
+	BStringView* newHighScore = new BStringView("newHighScore", newHighScoreText.String());
+	newHighScore->SetFont(be_bold_font);
+	newHighScore->SetFontSize(20);
+	newHighScore->SetAlignment(B_ALIGN_HORIZONTAL_CENTER);	
 
 	fInputBox = new
 		BTextControl("NameInput", B_TRANSLATE("Please enter your name:"), NULL,
 		new BMessage(kNameEntered));
-	fInputBox->MakeFocus();
 
 	BStringView* line1 = new BStringView("line1", B_TRANSLATE("You achieved a new highscore, beating the one"));
 	BString line2Text = B_TRANSLATE("by %oldHighscorer% by %deltaScore%.");
@@ -50,12 +56,15 @@ HighscoreWindow::HighscoreWindow(const char* oldHighscorer, const int32 oldHighs
 	BButton *saveName = new BButton("savename", B_TRANSLATE("Hooray!!!"),
 		new BMessage(kNameEntered));
 	saveName->ResizeToPreferred();
+	
+	fInputBox->MakeFocus();
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_WINDOW_INSETS)
 		.AddGroup(B_VERTICAL)
 			.Add(congratulations)
-			.AddStrut(5)
+			.AddStrut(3)
+			.Add(newHighScore)
 			.Add(line1)
 			.Add(line2)
 			.Add(line3)
