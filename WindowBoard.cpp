@@ -22,7 +22,6 @@
 #include <StringView.h>
 #include <IconUtils.h>
 #include <Resources.h>
-#include <Point.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "WindowBoard"
